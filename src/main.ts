@@ -10,6 +10,7 @@ class OwntracksRegion extends ScryptedDeviceBase implements OccupancySensor, Set
     getSetting(key: string): string | number | boolean {
         return null;
     }
+    // create settings that correspond to allowed usernames in this region
     getSettings(): Setting[] {
         var ret: Setting[] = [];
         for (var i = 0; i < this.storage.length; i++) {
@@ -29,6 +30,7 @@ class OwntracksRegion extends ScryptedDeviceBase implements OccupancySensor, Set
         })
         return ret;
     }
+    // create/rename users
     putSetting(key: string, value: string | number | boolean): void {
         if (key == 'new-user') {
             this.storage.setItem(value as string, false.toString());
@@ -40,6 +42,8 @@ class OwntracksRegion extends ScryptedDeviceBase implements OccupancySensor, Set
         }
         this.sendOccupancyEvent();
     }
+    // look at the user status for every user, and send the correct event.
+    // todo: timestamp? purge old users?
     sendOccupancyEvent() {
         for (var i = 0; i < this.storage.length; i++) {
             var key = this.storage.key(i);
@@ -68,6 +72,10 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
             });
         }
     }
+
+    // owntracks will call the endpoint with a password, so set up a simple password store
+    // that can be accessed via the scrypted web ui. this allows revocation of passwords,
+    // and denial of unauthorized users that may have the owntracks private http endpoint.
     getPasswords(): string[] {
         try {
             return JSON.parse(localStorage.getItem('passwords')) || [];
@@ -96,6 +104,7 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
     checkPassword(password: string): boolean {
         return this.getPasswords().includes(password);
     }
+
     discoverDevices(duration: number): void {
     }
     getDevice(nativeId: string): object {
@@ -105,6 +114,7 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
         return null;
     }
     getSettings(): Setting[] {
+        // create a settings menu that shows the private http endpoint, and allows creation of new regions.
         return [
             {
                 key: 'private_http',
@@ -121,6 +131,7 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
         ];
     }
     putSetting(key: string, value: string | number | boolean): void {
+        // creat the named region from the setting.
         deviceManager.onDeviceDiscovered({
             name: value.toString(),
             interfaces: ['OccupancySensor', 'Settings'],
@@ -145,6 +156,7 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
         }
         const body = JSON.parse(request.body);
 
+        // find all regions this user belongs to, and update them.
         for (var nativeId of deviceManager.getNativeIds()) {
             let region = new OwntracksRegion(nativeId);
             let value = region.storage.getItem(user.name);
@@ -153,7 +165,6 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
                 region.sendOccupancyEvent();
             }
         }
-        // Owntracks user needs to create a region named Scrypted, and when this is/isn't detected, fire an event.
         response.send('ok');
     }
 }
