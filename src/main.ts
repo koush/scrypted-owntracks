@@ -133,9 +133,7 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
     }
     onRequest(request: HttpRequest, response: HttpResponse): void {
         if (request.isPublicEndpoint) {
-            systemManager.getPublicCloudEndpoint().then(endpoint => {
-                response.send('Owntracks is running!\nSet up a Region within the Scrypted plugin!');
-            });
+            response.send('Owntracks is running!\nSet up a Region within the Scrypted plugin!');
             return;
         }
         var user = auth.parse(request.headers['authorization']);
