@@ -1,4 +1,9 @@
 {
+   "name": "@scrypted/owntracks",
+   "version": "0.0.1",
+   "description": "Owntracks Plugin for Scrypted",
+   "author": "Scrypted",
+   "license": "Apache",
    "scripts": {
       "prepublishOnly": "NODE_ENV=production scrypted-webpack",
       "prescrypted-vscode-launch": "scrypted-webpack",
@@ -13,19 +18,18 @@
       "plugin"
    ],
    "scrypted": {
-      "name": "JavaScript Light",
+      "name": "Owntracks Plugin",
       "type": "Device",
       "interfaces": [
-         "OnOff"
-      ],
-      "events": [
-         "OnOff"
+         "HttpRequestHandler",
+         "Settings",
+         "DeviceProvider"
       ]
    },
    "devDependencies": {
       "@scrypted/sdk": "0.0.29"
    },
    "dependencies": {
-      "axios": "^0.19.0"
+      "querystring": "^0.2.0"
    }
 }
