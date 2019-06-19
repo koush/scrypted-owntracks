@@ -32,7 +32,6 @@
       "@scrypted/sdk": "0.0.31"
    },
    "dependencies": {
-      "basic-auth": "^2.0.1",
-      "querystring": "^0.2.0"
+      "basic-auth": "^2.0.1"
    }
 }

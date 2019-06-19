@@ -1,5 +1,5 @@
 // https://developer.scrypted.app/#getting-started
-import sdk, { HttpRequestHandler, Settings, DeviceProvider, ScryptedDeviceType, OccupancySensor, Setting, HttpRequest, HttpResponse, PasswordStore, PushHandler } from "@scrypted/sdk";
+import sdk, { Settings, DeviceProvider, ScryptedDeviceType, OccupancySensor, Setting, HttpRequest, PasswordStore, PushHandler } from "@scrypted/sdk";
 import { ScryptedDeviceBase } from "@scrypted/sdk";
 const { log, deviceManager } = sdk;
 import auth from 'basic-auth';
