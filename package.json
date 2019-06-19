@@ -1,6 +1,6 @@
 {
    "name": "@scrypted/owntracks",
-   "version": "0.0.2",
+   "version": "0.0.5",
    "description": "Owntracks Plugin for Scrypted",
    "author": "Scrypted",
    "license": "Apache",
@@ -19,17 +19,20 @@
    ],
    "scrypted": {
       "name": "Owntracks Plugin",
+      "singleInstance": true,
       "type": "Device",
       "interfaces": [
          "HttpRequestHandler",
          "Settings",
-         "DeviceProvider"
+         "DeviceProvider",
+         "PasswordStore"
       ]
    },
    "devDependencies": {
-      "@scrypted/sdk": "0.0.30"
+      "@scrypted/sdk": "0.0.31"
    },
    "dependencies": {
+      "basic-auth": "^2.0.1",
       "querystring": "^0.2.0"
    }
 }
