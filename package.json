@@ -22,7 +22,7 @@
       "singleInstance": true,
       "type": "Device",
       "interfaces": [
-         "HttpRequestHandler",
+         "PushHandler",
          "Settings",
          "DeviceProvider",
          "PasswordStore"

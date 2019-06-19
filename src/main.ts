@@ -1,7 +1,7 @@
 // https://developer.scrypted.app/#getting-started
-import sdk, { HttpRequestHandler, Settings, DeviceProvider, ScryptedDeviceType, OccupancySensor, Setting, HttpRequest, HttpResponse, PasswordStore } from "@scrypted/sdk";
+import sdk, { HttpRequestHandler, Settings, DeviceProvider, ScryptedDeviceType, OccupancySensor, Setting, HttpRequest, HttpResponse, PasswordStore, PushHandler } from "@scrypted/sdk";
 import { ScryptedDeviceBase } from "@scrypted/sdk";
-const { log, deviceManager, systemManager } = sdk;
+const { log, deviceManager } = sdk;
 import auth from 'basic-auth';
 
 log.i('Hello World. This will create a virtual OnOff device.');
@@ -59,15 +59,13 @@ class OwntracksRegion extends ScryptedDeviceBase implements OccupancySensor, Set
     }
 }
 
-class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settings, DeviceProvider, PasswordStore {
+class Owntracks extends ScryptedDeviceBase implements PushHandler, Settings, DeviceProvider, PasswordStore {
     constructor() {
         super();
         this.passwords = this.getPasswords();
         if (!localStorage.getItem('private_http')) {
-            setImmediate(() => {
-                systemManager.getPublicCloudEndpoint().then(endpoint => {
-                    localStorage.setItem('private_http', endpoint);
-                });
+            deviceManager.getPublicPushEndpoint().then(endpoint => {
+                localStorage.setItem('private_http', endpoint);
                 log.a('The Owntracks Private HTTP endpoint is available in Settings.');
             });
         }
@@ -142,16 +140,9 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
     getEndpoint(): string {
         return "@scrypted/owntracks";
     }
-    onRequest(request: HttpRequest, response: HttpResponse): void {
-        if (request.isPublicEndpoint) {
-            response.send('Owntracks is running!\nSet up a Region within the Scrypted plugin!');
-            return;
-        }
+    onPush(request: HttpRequest): void {
         var user = auth.parse(request.headers['authorization']);
         if (!this.getPasswords().includes(user.pass)) {
-            response.send({
-                code: 401,
-            }, 'Bad Auth');
             return;
         }
         const body = JSON.parse(request.body);
@@ -165,7 +156,6 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
                 region.sendOccupancyEvent();
             }
         }
-        response.send('ok');
     }
 }
 
