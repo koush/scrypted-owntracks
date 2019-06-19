@@ -57,7 +57,7 @@ class Owntracks extends ScryptedDeviceBase implements HttpRequestHandler, Settin
             return;
         }
         // Owntracks user needs to create a region named Scrypted, and when this is/isn't detected, fire an event.
-        deviceManager.onDeviceEvent(owntracksId as string, 'OccupancySensor', (body.inregions && body.inregions.includes('Scrypted')));
+        deviceManager.onDeviceEvent(owntracksId as string, 'OccupancySensor', !!(body.inregions && body.inregions.includes('Scrypted')));
         response.send('ok');
     }
 }
