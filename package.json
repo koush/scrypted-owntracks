@@ -27,7 +27,7 @@
       ]
    },
    "devDependencies": {
-      "@scrypted/sdk": "0.0.29"
+      "@scrypted/sdk": "0.0.30"
    },
    "dependencies": {
       "querystring": "^0.2.0"
