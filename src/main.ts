@@ -1,7 +1,7 @@
 // https://developer.scrypted.app/#getting-started
 import sdk, { Settings, DeviceProvider, ScryptedDeviceType, OccupancySensor, Setting, HttpRequest, PasswordStore, PushHandler } from "@scrypted/sdk";
 import { ScryptedDeviceBase } from "@scrypted/sdk";
-const { log, deviceManager } = sdk;
+const { log, deviceManager, endpointManager } = sdk;
 import auth from 'basic-auth';
 
 log.i('Hello World. This will create a virtual OnOff device.');
@@ -64,7 +64,7 @@ class Owntracks extends ScryptedDeviceBase implements PushHandler, Settings, Dev
         super();
         this.passwords = this.getPasswords();
         if (!localStorage.getItem('private_http')) {
-            deviceManager.getPublicPushEndpoint().then(endpoint => {
+            endpointManager.getPublicPushEndpoint().then(endpoint => {
                 localStorage.setItem('private_http', endpoint);
                 log.a('The Owntracks Private HTTP endpoint is available in Settings.');
             });
