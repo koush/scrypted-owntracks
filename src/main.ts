@@ -1,10 +1,16 @@
 // https://developer.scrypted.app/#getting-started
-import sdk, { Settings, DeviceProvider, ScryptedDeviceType, OccupancySensor, Setting, HttpRequest, PasswordStore, PushHandler } from "@scrypted/sdk";
+import sdk, { Settings, DeviceProvider, ScryptedDeviceType, OccupancySensor, Setting, HttpRequest, PasswordStore, PushHandler, PositionSensor, ScryptedInterface } from "@scrypted/sdk";
 import { ScryptedDeviceBase } from "@scrypted/sdk";
 const { log, deviceManager, endpointManager } = sdk;
 import auth from 'basic-auth';
 
 log.i('Hello World. This will create a virtual OnOff device.');
+
+class OwntracksUser extends ScryptedDeviceBase implements PositionSensor {
+    constructor(nativeId: string) {
+        super(nativeId);
+    }
+}
 
 class OwntracksRegion extends ScryptedDeviceBase implements OccupancySensor, Settings {
     getSetting(key: string): string | number | boolean {
@@ -62,7 +68,6 @@ class OwntracksRegion extends ScryptedDeviceBase implements OccupancySensor, Set
 class Owntracks extends ScryptedDeviceBase implements PushHandler, Settings, DeviceProvider, PasswordStore {
     constructor() {
         super();
-        this.passwords = this.getPasswords();
         if (!localStorage.getItem('private_http')) {
             endpointManager.getPublicPushEndpoint().then(endpoint => {
                 localStorage.setItem('private_http', endpoint);
@@ -87,7 +92,6 @@ class Owntracks extends ScryptedDeviceBase implements PushHandler, Settings, Dev
         passwords.map(password => uniques[password] = true);
         passwords = Object.keys(uniques);
         localStorage.setItem('passwords', JSON.stringify(passwords));
-        this.passwords = passwords;
     }
     addPassword(password: string): void {
         var passwords = this.getPasswords();
@@ -146,6 +150,22 @@ class Owntracks extends ScryptedDeviceBase implements PushHandler, Settings, Dev
             return;
         }
         const body = JSON.parse(request.body);
+
+        const userNativeId = `user-${user.name}`;
+        if (!deviceManager.getNativeIds().includes(userNativeId)) {
+            deviceManager.onDeviceDiscovered({
+                name: `Owntracks User - ${user.name}`,
+                nativeId: userNativeId,
+                type: ScryptedDeviceType.Sensor,
+                interfaces: [ScryptedInterface.PositionSensor],
+            })
+        }
+        const owntracksUser = new OwntracksUser(userNativeId);
+        owntracksUser.position = {
+            latitude: body.lat,
+            longitude: body.lon,
+            accuracyRadius: body.acc,
+        }
 
         // find all regions this user belongs to, and update them.
         for (var nativeId of deviceManager.getNativeIds()) {
