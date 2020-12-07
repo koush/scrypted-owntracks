@@ -4,8 +4,6 @@ import { ScryptedDeviceBase } from "@scrypted/sdk";
 const { log, deviceManager, endpointManager } = sdk;
 import auth from 'basic-auth';
 
-log.i('Hello World. This will create a virtual OnOff device.');
-
 class OwntracksUser extends ScryptedDeviceBase implements PositionSensor {
     constructor(nativeId: string) {
         super(nativeId);
